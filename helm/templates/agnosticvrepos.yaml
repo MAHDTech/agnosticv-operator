@@ -11,8 +11,8 @@ spec:
 {{- if $agnosticvRepo.contextDir }}
   contextDir: {{ $agnosticvRepo.contextDir | quote }}
 {{- end }}
-  babylonAnarchyRoles:
-    {{- toYaml $.Values.babylonAnarchyRoles | nindent 4 }}
+  babylon_anarchy_roles:
+    {{- toYaml $.Values.babylon_anarchy_roles | nindent 4 }}
   {{- with $agnosticvRepo.sshKey }}
   sshKey: {{ $agnosticvRepo.name }}-sshkey
 ---
