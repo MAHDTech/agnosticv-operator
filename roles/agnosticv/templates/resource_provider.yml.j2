@@ -69,7 +69,16 @@ spec:
     - add
     - replace
     pathMatch: /spec/vars/desired_state
-{% if merged_vars.__meta__.poolboy.updateFilters | default([]) | length > 0 %}
+{% if merged_vars.__meta__.catalog.parameters | default([]) | length > 0 %}
+{%   for parameter in merged_vars.__meta__.catalog.parameters %}
+{%     if parameter.name == 'updatefilters' %}
+
+                    {{ parameter.name }}: {{ parameter.openAPIV3Schema | default({}) | combine({"description": parameter.description} if "description" in parameter else {}) | to_json }}
+{%   endfor %}
+                  required: {{ merged_vars.__meta__.catalog.parameters | json_query('[?required].name') | to_json }}
+{% endif %}
+
+
 {%   for filter in merged_vars.__meta__.poolboy.updateFilters %}
   - {{ filter | to_json }}
 {%   endfor %}
