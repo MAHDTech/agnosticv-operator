@@ -65,9 +65,13 @@ spec:
     - add
     - replace
     pathMatch: /spec/vars/desired_state
-{% if merged_vars.__meta__.updateFilters | default([]) | length > 0 %}
-{%   for filter in merged_vars.__meta__.updateFilters %}
+{% if merged_vars.__meta__.catalog.parameters | default([]) | length > 0 %}
+{%   for parameter in merged_vars.__meta__.catalog.parameters %}
+{%     if parameter.name == 'updateFilters' %}
+{%       for filter in parameter.updateFilters %}
   - {{ filter | to_json }}
+{%       endfor %}
+{%     endif %}
 {%   endfor %}
 {% endif %}
   validation:
