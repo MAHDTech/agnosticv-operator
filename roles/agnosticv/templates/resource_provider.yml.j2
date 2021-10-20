@@ -66,7 +66,9 @@ spec:
     - replace
     pathMatch: /spec/vars/desired_state
 {% if merged_vars.__meta__.updateFilters | default([]) | length > 0 %}
-  {{ merged_vars.__meta__.updateFilters | to_json }}
+{%   for filter in merged_vars.__meta__.updateFilters %}
+  - {{ filter | to_json }}
+{%   endfor %}
 {% endif %}
   validation:
     openAPIV3Schema:
