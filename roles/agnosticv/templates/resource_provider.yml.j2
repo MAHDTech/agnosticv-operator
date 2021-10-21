@@ -15,6 +15,7 @@ spec:
           start: '{% raw %}{{ timestamp.utcnow }}{% endraw %}'
           stop: '{% raw %}{{ timestamp.utcnow.add(resource_provider.spec.override.spec.vars.action_schedule.default_runtime) }}{% endraw %}'
   lifespan: {{ merged_vars.__meta__.lifespan | default(resource_provider_default_lifespan) | to_json }}
+  match: {{ merged_vars.__meta__.match | default('') | to_json }}
   matchIgnore:
   - /spec/vars/action_schedule(/.*)?
   override:
@@ -65,8 +66,8 @@ spec:
     - add
     - replace
     pathMatch: /spec/vars/desired_state
-{% if merged_vars.__meta__.catalog.parameters | default([]) | length > 0 %}
-{%   for parameter in merged_vars.__meta__.catalog.parameters %}
+{% if merged_vars.__meta__.catalog.spec_parameters | default([]) | length > 0 %}
+{%   for parameter in merged_vars.__meta__.catalog.spec_parameters %}
 {%     if parameter.name == 'updateFilters' %}
 {%       for filter in parameter.updateFilters %}
   - {{ filter | to_json }}
@@ -85,8 +86,13 @@ spec:
           type: object
           additionalProperties: false
           required:
-          - vars
+            - vars
           properties:
+{% if merged_vars.__meta__.catalog.spec_parameters | default([]) | length > 0 %}
+{%   for parameter in merged_vars.__meta__.catalog.spec_parameters %}
+            {{ parameter.name }}: {{ parameter.openAPIV3Schema | default({}) | combine({"description": parameter.description} if "description" in parameter else {}) | to_json }}
+{%   endfor %}
+{% endif %}
             vars:
               type: object
               additionalProperties: false
