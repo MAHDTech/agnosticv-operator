@@ -15,7 +15,13 @@ spec:
           start: '{% raw %}{{ timestamp.utcnow }}{% endraw %}'
           stop: '{% raw %}{{ timestamp.utcnow.add(resource_provider.spec.override.spec.vars.action_schedule.default_runtime) }}{% endraw %}'
   lifespan: {{ merged_vars.__meta__.lifespan | default(resource_provider_default_lifespan) | to_json }}
-  match: {{ merged_vars.__meta__.match | default({}) | to_json }}
+{% if merged_vars.__meta__.catalog.spec_parameters | default([]) | length > 0 %}
+{%   for parameter in merged_vars.__meta__.catalog.spec_parameters %}
+{%     if parameter.name == 'match' %}
+  match: {{ parameter.match | default({}) | to_json }}
+{%     endif %}
+{%   endfor %}
+{% endif %}
   matchIgnore:
   - /spec/vars/action_schedule(/.*)?
   override:
@@ -82,6 +88,13 @@ spec:
       required:
       - spec
       properties:
+{% if merged_vars.__meta__.catalog.spec_parameters | default([]) | length > 0 %}
+{%   for parameter in merged_vars.__meta__.catalog.spec_parameters %}
+{%     if parameter.openAPIV3Schema_root | default({}) | length > 0 %}
+            {{ parameter.name }}: {{ parameter.openAPIV3Schema_root | default({}) | combine({"description": parameter.description} if "description" in parameter else {}) | to_json }}
+{%     endif %}
+{%   endfor %}
+{% endif %}
         spec:
           type: object
           additionalProperties: false
