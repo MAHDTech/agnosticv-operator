@@ -15,7 +15,7 @@ spec:
           start: '{% raw %}{{ timestamp.utcnow }}{% endraw %}'
           stop: '{% raw %}{{ timestamp.utcnow.add(resource_provider.spec.override.spec.vars.action_schedule.default_runtime) }}{% endraw %}'
   lifespan: {{ merged_vars.__meta__.lifespan | default(resource_provider_default_lifespan) | to_json }}
-  match: {{ merged_vars.__meta__.match | default('') | to_json }}
+  match: {{ merged_vars.__meta__.match | default({}) | to_json }}
   matchIgnore:
   - /spec/vars/action_schedule(/.*)?
   override:
