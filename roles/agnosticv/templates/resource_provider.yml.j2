@@ -29,6 +29,7 @@ spec:
         action_schedule:
           default_runtime: {{ merged_vars.__meta__.runtime.default | default(resource_provider_runtime_default) | to_json }}
           maximum_runtime: {{ merged_vars.__meta__.runtime.maximum | default(resource_provider_runtime_maximum) | to_json }}
+
         desired_state: |-
 {% raw %}
           {%- if resource_template.spec.vars.action_schedule.start | default('') == ''
@@ -56,6 +57,14 @@ spec:
   - allowedOps:
     - add
     - replace
+    pathMatch: /spec/vars/action_schedule/default_runtime
+  - allowedOps:
+    - add
+    - replace
+    pathMatch: /spec/vars/action_schedule/maximum_runtime
+  - allowedOps:
+    - add
+    - replace
     pathMatch: /spec/vars/action_schedule/start
   - allowedOps:
     - add
@@ -75,14 +84,43 @@ spec:
       type: object
       additionalProperties: false
       required:
+      - apiVersion
+      - kind
+      - metadata
       - spec
       properties:
+        apiVersion:
+          enum:
+          - anarchy.gpte.redhat.com/v1
+          type: string
+        kind:
+          enum:
+          - AnarchySubject
+          type: string
+        metadata:
+          additionalProperties: false
+          properties:
+            annotations:
+              additionalProperties:
+                type: string
+              type: object
+            generateName:
+              type: string
+            labels:
+              additionalProperties:
+                type: string
+              type: object
+          type: object
         spec:
           type: object
           additionalProperties: false
           required:
+          - governor
           - vars
           properties:
+            governor:
+              type: string
+              additionalProperties: false
             vars:
               type: object
               additionalProperties: false
